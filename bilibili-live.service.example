@@ -4,6 +4,7 @@ Requires=network.target
 After=network.target
 
 [Service]
+Environment=TZ=Asia/Shanghai
 WorkingDirectory=/opt/bilibili-live/
 ExecStart=/opt/bilibili-live/bilibili-live.py
 Restart=always
