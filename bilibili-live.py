@@ -30,7 +30,7 @@ API_PASSPORT_MINILOGIN = '%s/ajax/miniLogin' % API_PASSPORT
 API_PASSPORT_MINILOGIN_MINILOGIN = '%s/minilogin' % API_PASSPORT_MINILOGIN
 API_PASSPORT_MINILOGIN_LOGIN = '%s/login' % API_PASSPORT_MINILOGIN
 
-HEART_DELTA = timedelta(minutes=1)
+HEART_DELTA = timedelta(minutes=5, seconds=30)
 
 
 def build_report(items):
@@ -139,26 +139,24 @@ class BiliBiliLiveRoom:
         if not user_info:
             return
         data = user_info['data']
-        upgrade_requires = data['user_next_intimacy'] - data['user_intimacy']
-        upgrade_progress = data['user_intimacy'] / data['user_next_intimacy']
-        upgrade_takes_time = ceil(upgrade_requires / 3000) * 5
-        upgrade_takes_time = timedelta(minutes=upgrade_takes_time)
+        upgrade_takes_time = ceil(upgrade_requires / 3000) * HEART_DELTA
+        upgrade_done_time = heart_time + upgrade_takes_time
         heart_time = datetime.now()
-        heart_next_time = heart_time + HEART_DELTA
-
-        user_live_intimacy = '%(user_intimacy)s -> %(user_next_intimacy)s' % data
+        # yapf: disable
         items = (
             '---------------------------------------',
             ('User name', data['uname']),
             ('User level', '%(user_level)s -> %(user_next_level)s' % data),
             ('User level rank', data['user_level_rank']),
-            ('User intimacy', user_live_intimacy),
-            ('Upgrade requires', upgrade_requires),
+            ('User intimacy', '%(user_intimacy)s -> %(user_next_intimacy)s' % data),
+            ('Upgrade requires', data['user_next_intimacy'] - data['user_intimacy']),
             ('Upgrade takes time', upgrade_takes_time),
-            ('Upgrade progress', upgrade_progress),
+            ('Upgrade done time', upgrade_done_time.isoformat()),
+            ('Upgrade progress', '%.6f%%' % (data['user_intimacy'] / data['user_next_intimacy'])),
             ('Heart time', heart_time.isoformat()),
             '---------------------------------------',
         )
+        # yapf: enable
         self.logger.info('\n%s', build_report(items))
 
 
