@@ -139,10 +139,10 @@ class BiliBiliLiveRoom:
         if not user_info:
             return
         data = user_info['data']
+        heart_time = datetime.now()
         upgrade_requires = data['user_next_intimacy'] - data['user_intimacy']
         upgrade_takes_time = ceil(upgrade_requires / 3000) * HEART_DELTA
         upgrade_done_time = heart_time + upgrade_takes_time
-        heart_time = datetime.now()
         # yapf: disable
         items = (
             '---------------------------------------',
