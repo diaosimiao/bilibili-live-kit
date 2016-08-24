@@ -24,6 +24,7 @@ API_LIVE_SIGN_GET_SIGN_INFO = '%s/sign/GetSignInfo' % API_LIVE
 API_LIVE_GIFT_PLAYER_BAG = '%s/gift/playerBag' % API_LIVE
 API_LIVE_GIFT_BAG_SEND = '%s/giftBag/send' % API_LIVE
 API_LIVE_GIFT_BAG_SEND_DAILY = '%s/giftBag/sendDaily' % API_LIVE
+API_LIVE_GIFT_BAG_GET_SEND_GIFT = '%s/giftBag/getSendGift' % API_LIVE
 API_PASSPORT = 'https://passport.bilibili.com'
 API_PASSPORT_GET_RSA_KEY = '%s/login?act=getkey' % API_PASSPORT
 API_PASSPORT_MINILOGIN = '%s/ajax/miniLogin' % API_PASSPORT
@@ -205,7 +206,9 @@ class BiliBiliLiveGift:
             return {'room_id': matches.group(1), 'danmu_rnd': matches.group(2)}
 
     def get_gift_renewal(self):
-        self.session.get(API_LIVE_GIFT_BAG_SEND_DAILY)
+        rasp = self.session.get(API_LIVE_GIFT_BAG_SEND_DAILY)
+        if rasp.json()['data']['result'] != 1:
+            self.session.get(API_LIVE_GIFT_BAG_GET_SEND_GIFT)
 
     def get_gift_metainfo(self):
         rasp = self.session.get(API_LIVE_GIFT_PLAYER_BAG)
