@@ -153,7 +153,7 @@ class BiliBiliLiveRoom:
             ('Upgrade requires', upgrade_requires),
             ('Upgrade takes time', upgrade_takes_time),
             ('Upgrade done time', upgrade_done_time.isoformat()),
-            ('Upgrade progress', '%.6f%%' % (data['user_intimacy'] / data['user_next_intimacy'])),
+            ('Upgrade progress', '{:.6%}'.format(data['user_intimacy'] / data['user_next_intimacy'])),
             ('Heart time', heart_time.isoformat()),
             '---------------------------------------',
         )
