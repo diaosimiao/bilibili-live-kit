@@ -150,7 +150,7 @@ class BiliBiliLiveRoom:
             ('User level rank', data['user_level_rank']),
             ('User intimacy', '%(user_intimacy)s -> %(user_next_intimacy)s' % data),
             ('Upgrade requires', data['user_next_intimacy'] - data['user_intimacy']),
-            ('Upgrade takes time', upgrade_takes_time),
+            ('Upgrade takes time', upgrade_takes_time.isoformat()),
             ('Upgrade done time', upgrade_done_time.isoformat()),
             ('Upgrade progress', '%.6f%%' % (data['user_intimacy'] / data['user_next_intimacy'])),
             ('Heart time', heart_time.isoformat()),
