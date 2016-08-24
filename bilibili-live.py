@@ -139,6 +139,7 @@ class BiliBiliLiveRoom:
         if not user_info:
             return
         data = user_info['data']
+        upgrade_requires = data['user_next_intimacy'] - data['user_intimacy']
         upgrade_takes_time = ceil(upgrade_requires / 3000) * HEART_DELTA
         upgrade_done_time = heart_time + upgrade_takes_time
         heart_time = datetime.now()
@@ -149,8 +150,8 @@ class BiliBiliLiveRoom:
             ('User level', '%(user_level)s -> %(user_next_level)s' % data),
             ('User level rank', data['user_level_rank']),
             ('User intimacy', '%(user_intimacy)s -> %(user_next_intimacy)s' % data),
-            ('Upgrade requires', data['user_next_intimacy'] - data['user_intimacy']),
-            ('Upgrade takes time', upgrade_takes_time.isoformat()),
+            ('Upgrade requires', upgrade_requires),
+            ('Upgrade takes time', upgrade_takes_time),
             ('Upgrade done time', upgrade_done_time.isoformat()),
             ('Upgrade progress', '%.6f%%' % (data['user_intimacy'] / data['user_next_intimacy'])),
             ('Heart time', heart_time.isoformat()),
