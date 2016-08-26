@@ -155,7 +155,6 @@ class BiliBiliLiveRoom:
             ('Upgrade takes time', upgrade_takes_time),
             ('Upgrade done time', upgrade_done_time.isoformat()),
             ('Upgrade progress', '{:.6%}'.format(data['user_intimacy'] / data['user_next_intimacy'])),
-            ('Heart time', heart_time.isoformat()),
             '---------------------------------------',
         )
         # yapf: enable
@@ -300,7 +299,7 @@ def send_gift(passport):
         gift.get_gift_renewal()
         metainfo = gift.get_gift_metainfo()
         if not metainfo:
-            return
+            continue
         room_info = metainfo['room_info']
         danmu_rnd = room_info['danmu_rnd']
         for gift_info in metainfo['gift_items']:
