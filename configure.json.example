@@ -3,16 +3,21 @@
     {
       "username": "your username",
       "password": "your password",
-      "room_id": null
+      "options": {
+        "room_id": null,
+        "cookies_path": null
+      }
     },
     {
       "username": "your username",
       "password": "your password",
-      "room_id": null
+      "options": {
+        "room_id": null,
+        "cookies_path": null
+      }
     }
   ],
   "logging": {
-    "level": 20,
     "filename": "logging.log",
     "filemode": "w"
   }

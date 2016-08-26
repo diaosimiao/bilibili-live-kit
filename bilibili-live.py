@@ -35,29 +35,26 @@ HEART_DELTA = timedelta(minutes=5, seconds=30)
 
 
 def build_report(items):
-    def build(items):
-        for item in items:
-            if isinstance(item, tuple) and len(item) == 2:
-                yield '%20s: %s' % item
-            elif isinstance(item, str) and '-' in item:
-                yield '-' * 48
-            else:
-                yield item
+    def handle(item):
+        if isinstance(item, tuple) and len(item) == 2:
+            return '%20s: %s' % item
+        if isinstance(item, str) and '-' in item:
+            return '-' * 48
+        return item
 
-    return '\n'.join(build(items))
+    return '\n'.join(map(handle, items))
 
 
 class BiliBiliPassport:
-    def __init__(
-        self,
-        username,
-        password,
-        room_id=None,
-        cookies_path='bilibili.passport'
-    ):
+    def __init__(self, options: dict):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.session = requests.session()
-        self.__room_id = room_id
+        self.options = options.get('options', {})
+
+        username = options['username']
+        password = options['password']
+        cookies_path = options.get('cookies_path') or 'bilibili.passport'
+
         self.__cookies_load(username, cookies_path)
         if self.login(username, password):
             self.__cookies_save(username, cookies_path)
@@ -90,8 +87,8 @@ class BiliBiliPassport:
         return rasp.json()['code'] == 'REPONSE_OK'
 
     def get_room_id(self):
-        if self.__room_id:
-            return self.__room_id
+        if 'room_id' in self.options:
+            return self.options.get('room_id')
         rasponse = self.session.get(API_LIVE)
         matches = re.search(r'data-room-id="(\d+)"', rasponse.text)
         if matches:
@@ -285,7 +282,7 @@ def set_logger_level(options):
 
 def send_heart(passport):
     while True:
-        live = BiliBiliLiveRoom(BiliBiliPassport(**passport))
+        live = BiliBiliLiveRoom(BiliBiliPassport(passport))
         heart_status = live.send_heart()
         user_info = live.get_user_info()
         if heart_status == True:
@@ -295,7 +292,7 @@ def send_heart(passport):
 
 def send_gift(passport):
     while True:
-        gift = BiliBiliLiveGift(BiliBiliPassport(**passport))
+        gift = BiliBiliLiveGift(BiliBiliPassport(passport))
         gift.get_gift_renewal()
         metainfo = gift.get_gift_metainfo()
         if not metainfo:
@@ -312,7 +309,7 @@ def send_gift(passport):
 
 def send_check_in(passport):
     while True:
-        check_in = BiliBiliLiveCheckIn(BiliBiliPassport(**passport))
+        check_in = BiliBiliLiveCheckIn(BiliBiliPassport(passport))
         if not check_in.has_check_in():
             check_in.send_check_in()
         sleep(HEART_DELTA.total_seconds())
