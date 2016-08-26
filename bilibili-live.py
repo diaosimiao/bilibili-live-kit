@@ -87,8 +87,9 @@ class BiliBiliPassport:
         return rasp.json()['code'] == 'REPONSE_OK'
 
     def get_room_id(self):
-        if 'room_id' in self.options:
-            return self.options.get('room_id')
+        room_id = self.options.get('room_id')
+        if isinstance(room_id, int):
+            return room_id
         rasponse = self.session.get(API_LIVE)
         matches = re.search(r'data-room-id="(\d+)"', rasponse.text)
         if matches:
