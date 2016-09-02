@@ -56,9 +56,7 @@ class BiliBiliPassport:
         cookies_path = options.get('cookies_path') or 'bilibili.passport'
 
         self.__cookies_load(username, cookies_path)
-        if self.login(username, password):
-            self.__cookies_save(username, cookies_path)
-        else:
+        if not self.login(username, password, cookies_path):
             self.logger.error('login faild')
             exit()
 
@@ -68,7 +66,7 @@ class BiliBiliPassport:
         encrypted = rsa.encrypt((data['hash'] + password).encode(), pub_key)
         return base64_encode(encrypted).decode()
 
-    def login(self, username, password):
+    def login(self, username, password, cookies_path):
         if not self.check_login():
             self.session.get(API_PASSPORT_MINILOGIN_MINILOGIN)
             payload = {
@@ -79,6 +77,8 @@ class BiliBiliPassport:
             }
             rasp = self.session.post(API_PASSPORT_MINILOGIN_LOGIN, data=payload)
             self.logger.debug('login rasponse: %s', rasp.json())
+            if rasp.json()['status']:
+                self.__cookies_save(username, cookies_path)
             return rasp.json()['status']
         return True
 
