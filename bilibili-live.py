@@ -6,10 +6,12 @@ import os
 import re
 from base64 import b64encode as base64_encode
 from datetime import date, datetime, timedelta
+from io import BytesIO
 from math import ceil
 from threading import Thread
 from time import sleep, time
 
+import captcha
 import requests
 import rsa
 from requests.utils import cookiejar_from_dict, dict_from_cookiejar
@@ -25,6 +27,9 @@ API_LIVE_GIFT_PLAYER_BAG = '%s/gift/playerBag' % API_LIVE
 API_LIVE_GIFT_BAG_SEND = '%s/giftBag/send' % API_LIVE
 API_LIVE_SUMMER_HEART = '%s/summer/heart' % API_LIVE
 API_LIVE_GIFT_BAG_GET_SEND_GIFT = '%s/giftBag/getSendGift' % API_LIVE
+API_LIVE_FREE_SILVER_GET_AWARD = '%s/FreeSilver/getAward' % API_LIVE
+API_LIVE_FREE_SILVER_GET_CAPTCHA = '%s/FreeSilver/getCaptcha' % API_LIVE
+API_LIVE_FREE_SILVER_GET_TASK = '%s/FreeSilver/getCurrentTask' % API_LIVE
 API_PASSPORT = 'https://passport.bilibili.com'
 API_PASSPORT_GET_RSA_KEY = '%s/login?act=getkey' % API_PASSPORT
 API_PASSPORT_MINILOGIN = '%s/ajax/miniLogin' % API_PASSPORT
@@ -176,6 +181,53 @@ class BiliBiliLiveCheckIn:
         return payload['code'] == 0
 
 
+class BiliBiliLiveTreasure:
+    def __init__(self, passport: BiliBiliPassport):
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.passport = passport
+        self.session = passport.session
+        self.time_start = 0
+        self.time_end = 0
+        self.amount = 0
+
+    def get_wait_time(self):
+        result = self.session.get(API_LIVE_FREE_SILVER_GET_TASK).json()
+        if result['code'] == 0:
+            if len(result['data']) > 0:
+                self.logger.info('%s', 'Get %d free silver in %d minutes' % (result['data']['silver'], result['data']['minute']))
+                self.time_start = result['data']['time_start']
+                self.time_end = result['data']['time_end']
+                self.amount = result['data']['silver']
+                return result['data']['minute']
+        return 0
+
+    def open(self):
+        captcha_val = self.get_captcha()
+        if captcha_val == -255:
+            return False
+        params = "?time_start=%d&time_end=%d&captcha=%d" % (self.time_start, self.time_end, captcha_val)
+        result = self.session.post(API_LIVE_FREE_SILVER_GET_AWARD + params).json()
+        if result['code'] == 0:
+            self.logger.info('Open treasure, Got %d silver', self.amount)
+            return True
+        self.logger.info('Open treasure failed: %s', result['msg'])
+        return
+
+    def get_captcha(self):
+        rasp = self.session.get(API_LIVE_FREE_SILVER_GET_CAPTCHA)
+        try:
+            captcha_str = captcha.get_captcha(BytesIO(rasp.content))
+            result = eval(captcha_str)
+            self.logger.info('%s %s=%d', 'Resolved captcha:', captcha_str, result)
+            return result
+        except OSError:
+            self.logger.error('%s\n%s', 'Request Failed!', rasp.content)
+            return -255
+        except 'Unknown Char':
+            self.logger.error('%s', 'Resolved captcha failed!')
+            return -255
+
+
 class BiliBiliLiveGift:
     def __init__(self, passport: BiliBiliPassport):
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -316,12 +368,28 @@ def send_check_in(passport):
         sleep(HEART_DELTA.total_seconds())
 
 
+def start_treasure(passport):
+    while True:
+        treasure = BiliBiliLiveTreasure(BiliBiliPassport(passport))
+        wait_time = treasure.get_wait_time()
+        if wait_time > 0:
+            sleep(timedelta(minutes=wait_time, seconds=1).total_seconds())
+            retries = 3
+            while retries > 0:
+                if treasure.open():
+                    break
+                retries -= 1
+            break
+        else:
+            sleep(HEART_DELTA.total_seconds())
+
+
 def main():
     conf = json.load(open('configure.json'))
     set_logger_level(conf['logging'])
 
     for passport in conf['passports']:
-        for handler in (send_heart, send_gift, send_check_in):
+        for handler in (send_heart, send_gift, send_check_in, start_treasure):
             thread = Thread(
                 target=handler,
                 name='%s ~ %s' % (handler.__name__, passport['username']),
