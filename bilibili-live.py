@@ -205,8 +205,12 @@ class BiliBiliLiveTreasure:
         captcha_val = self.get_captcha()
         if captcha_val == -255:
             return False
-        params = "?time_start=%d&time_end=%d&captcha=%d" % (self.time_start, self.time_end, captcha_val)
-        result = self.session.post(API_LIVE_FREE_SILVER_GET_AWARD + params).json()
+        payload = dict(
+            time_start=self.time_start,
+            time_end=self.time_end,
+            captcha=captcha_val
+        )
+        result = self.session.post(API_LIVE_FREE_SILVER_GET_AWARD, params=payload).json()
         if result['code'] == 0:
             self.logger.info('Open treasure, Got %d silver', self.amount)
             return True
