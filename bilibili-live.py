@@ -383,7 +383,6 @@ def start_treasure(passport):
                 if treasure.open():
                     break
                 retries -= 1
-            break
         else:
             sleep(HEART_DELTA.total_seconds())
 
