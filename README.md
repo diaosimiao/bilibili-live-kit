@@ -1,8 +1,9 @@
 # Features
 
 1. send heartbeat to gain experience
-2. every day check in
-3. clear all gift
+2. daily tasks - check in
+2. daily tasks - get free silver
+3. gift expiration day cleanup
 4. support multi passport
 5. support custom gift target room
 
