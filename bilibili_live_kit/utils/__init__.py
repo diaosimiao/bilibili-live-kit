@@ -22,13 +22,13 @@ def set_logger_level(options):
     }
     handlers = {
         'console': {
-            'class': logging.StreamHandler,
+            'class': 'logging.StreamHandler',
             'formatter': 'standard',
             'level': 'DEBUG',
             'stream': 'ext://sys.stdout'
         },
         'file': {
-            'class': logging.FileHandler,
+            'class': 'logging.FileHandler',
             'formatter': 'standard',
             'level': 'INFO',
             'filename': options['filename'],
