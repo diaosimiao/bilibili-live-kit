@@ -1,36 +1,38 @@
 #!/usr/bin/env python3
 import os
-import zipapp
-import zipfile
+import re
 from tempfile import mkstemp
-from zipfile import ZipFile
+from zipapp import create_archive
+from zipfile import ZipFile, ZIP_DEFLATED
 
 
 def zipfile_module(zip_file, module_name):
     module = __import__(module_name)
-    module_path = module.__path__[0]
-    for directory_path, dirs, files in os.walk(module_path):
-        for file_name in files:
-            if '__pycache__' in directory_path:
+    module_path = os.path.dirname(module.__file__)
+    for dirpath, _, filenames in os.walk(module_path):
+        for filename in filenames:
+            if '__pycache__' in dirpath:
                 continue
-            if file_name.endswith('.pyc') or file_name.endswith('.pyo'):
+            if re.search('\.(py[cod]|so)$', filename):
                 continue
-            store_path = os.path.join(directory_path.replace(module_path, module_name), file_name)
-            target_path = os.path.join(directory_path, file_name)
-            print('write', store_path)
+            if re.search('\$py\.class$', filename):
+                continue
+            target_path = os.path.join(dirpath, filename)
+            store_path = target_path.replace(module_path, module_name)
             zip_file.write(target_path, store_path)
+            print('write %r done' % store_path)
 
 
 def main():
     export_filename = 'bilibili-live.pyz'
     _, temp_path = mkstemp()
-    with ZipFile(temp_path, 'w', compression=zipfile.ZIP_DEFLATED) as target:
+    with ZipFile(temp_path, 'w', compression=ZIP_DEFLATED) as target:
         zipfile_module(target, 'requests')
         zipfile_module(target, 'pyasn1')
         zipfile_module(target, 'rsa')
         zipfile_module(target, 'bilibili_live_kit')
         target.write('bilibili-live.py', '__main__.py')
-    zipapp.create_archive(temp_path, export_filename, '/usr/bin/env python3')
+    create_archive(temp_path, export_filename, '/usr/bin/env python3')
     os.chmod(export_filename, 0o744)
 
 
