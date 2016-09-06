@@ -1,6 +1,6 @@
 from PIL import Image
 
-from .captcha_sample import payload as __samples
+from .captcha_sample import payload as samples
 
 __ALL__ = ['get_captcha']
 
@@ -21,7 +21,7 @@ def trim_y(image):
     return image.crop((0, start, width, end))
 
 
-def img_to_str(image):
+def image_to_ascii_image(image):
     def handle():
         width, height = image.size
         for y in range(height):
@@ -33,7 +33,7 @@ def img_to_str(image):
     return ''.join(handle()).strip('-')
 
 
-def get_symbol_score(code, samples):
+def get_symbol(code, threshold):
     symbol_key = '?'
     symbol_score = 0
     for key, value in samples.items():
@@ -42,36 +42,37 @@ def get_symbol_score(code, samples):
             continue
         score = len(list(filter(lambda offset: value[offset] == code[offset], range(len(value)))))
         score /= len(value)
-        if score < symbol_score and score < .95:
+        if score < symbol_score and score < threshold:
             continue
         symbol_key = key
         symbol_score = score
-    return symbol_key, symbol_score
+    return symbol_key
+
+
+def get_sub_image(image):
+    width, height = image.size
+    start = 0
+    for x in range(width):
+        found = False
+        for y in range(height):
+            point = image.getpixel((x, y))[0]
+            if point < 0x7F:
+                found = True
+        if found and start == 0:
+            start = x
+        elif not found and start > 0:
+            yield trim_y(image.crop((start, 0, x, height)))
+            start = 0
 
 
 def get_captcha(image):
-    image = Image.open(image)
-    image = image.convert('LA')
+    image = Image.open(image).convert('LA')
 
     def handle():
-        width, height = image.size
-        start = 0
-        for x in range(width):
-            found = False
-            for y in range(height):
-                point = image.getpixel((x, y))[0]
-                if point < 0x7F:
-                    found = True
-            if found and start == 0:
-                start = x
-            elif not found and start > 0:
-                sub_img = image.crop((start, 0, x, height))
-                sub_img = trim_y(sub_img)
-                code = img_to_str(sub_img)
-                symbol_key, symbol_score = get_symbol_score(code, __samples)
-                if symbol_key == '?':
-                    raise Exception('Unknown Char')
-                yield symbol_key
-                start = 0
+        for sub_image in get_sub_image(image):
+            symbol = get_symbol(image_to_ascii_image(sub_image), threshold=0.95)
+            if symbol == '?':
+                raise Exception('Unknown Char')
+            yield symbol
 
     return ''.join(handle())
