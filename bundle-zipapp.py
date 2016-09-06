@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import os
-import stat
 import zipapp
 import zipfile
 from tempfile import mkstemp
@@ -32,7 +31,7 @@ def main():
         zipfile_module(target, 'bilibili_live_kit')
         target.write('bilibili-live.py', '__main__.py')
     zipapp.create_archive(temp_path, export_filename, '/usr/bin/env python3')
-    os.chmod(export_filename, 744)
+    os.chmod(export_filename, 0o744)
 
 
 if __name__ == '__main__':
