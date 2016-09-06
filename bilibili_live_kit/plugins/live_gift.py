@@ -4,7 +4,6 @@ from time import time, sleep
 
 from . import API_LIVE_GET_ROOM_INFO, \
     API_LIVE_ROOM, \
-    API_LIVE_SUMMER_HEART, \
     API_LIVE_GIFT_PLAYER_BAG, \
     API_LIVE_GIFT_BAG_SEND, \
     HEART_DELTA
@@ -38,9 +37,6 @@ class BiliBiliLiveGift:
         matches = re.search(pattern, rasp.text)
         if matches:
             return {'room_id': matches.group(1), 'danmu_rnd': matches.group(2)}
-
-    def get_gift_renewal(self):
-        self.session.get(API_LIVE_SUMMER_HEART)
 
     def get_gift_meta_info(self):
         rasp = self.session.get(API_LIVE_GIFT_PLAYER_BAG)
@@ -88,7 +84,6 @@ def send_gift(passport: BiliBiliPassport):
         if not passport.login():
             continue
         gift = BiliBiliLiveGift(passport)
-        gift.get_gift_renewal()
         meta_info = gift.get_gift_meta_info()
         if not meta_info:
             continue

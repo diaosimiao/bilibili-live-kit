@@ -9,7 +9,6 @@ API_LIVE_SIGN_DO_SIGN = '%s/sign/doSign' % API_LIVE
 API_LIVE_SIGN_GET_SIGN_INFO = '%s/sign/GetSignInfo' % API_LIVE
 API_LIVE_GIFT_PLAYER_BAG = '%s/gift/playerBag' % API_LIVE
 API_LIVE_GIFT_BAG_SEND = '%s/giftBag/send' % API_LIVE
-API_LIVE_SUMMER_HEART = '%s/summer/heart' % API_LIVE
 API_LIVE_GIFT_BAG_GET_SEND_GIFT = '%s/giftBag/getSendGift' % API_LIVE
 API_LIVE_FREE_SILVER_GET_AWARD = '%s/FreeSilver/getAward' % API_LIVE
 API_LIVE_FREE_SILVER_GET_CAPTCHA = '%s/FreeSilver/getCaptcha' % API_LIVE
