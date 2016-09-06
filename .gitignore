@@ -1,4 +1,6 @@
+/.idea
 /configure.json
 /logging.log
 /bilibili.passport
 __pycache__
+.DS_Store
