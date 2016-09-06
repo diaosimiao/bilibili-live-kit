@@ -2,10 +2,10 @@
 
 1. send heartbeat to gain experience
 2. daily tasks - check in
-2. daily tasks - get free silver
-3. gift expiration day cleanup
-4. support multi passport
-5. support custom gift target room
+3. daily tasks - get free silver
+4. gift expiration day cleanup
+5. support multi passport
+6. support custom gift target room
 
 # Install and Using
 ```
