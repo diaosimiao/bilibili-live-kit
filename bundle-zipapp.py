@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import stat
 import zipapp
 import zipfile
 from tempfile import mkstemp
@@ -22,6 +23,7 @@ def zipfile_module(zip_file, module_name):
 
 
 def main():
+    export_filename = 'bilibili-live.pyz'
     _, temp_path = mkstemp()
     with ZipFile(temp_path, 'w', compression=zipfile.ZIP_DEFLATED) as target:
         zipfile_module(target, 'requests')
@@ -29,7 +31,8 @@ def main():
         zipfile_module(target, 'rsa')
         zipfile_module(target, 'bilibili_live_kit')
         target.write('bilibili-live.py', '__main__.py')
-    zipapp.create_archive(temp_path, 'bilibili-live.pyz', '/usr/bin/env python3')
+    zipapp.create_archive(temp_path, export_filename, '/usr/bin/env python3')
+    os.chmod(export_filename, 744)
 
 
 if __name__ == '__main__':

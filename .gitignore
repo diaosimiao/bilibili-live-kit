@@ -2,5 +2,6 @@
 /configure.json
 /logging.log
 /bilibili.passport
+/bilibili-live.pyz
 __pycache__
 .DS_Store
