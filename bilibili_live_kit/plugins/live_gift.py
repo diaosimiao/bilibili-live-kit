@@ -19,7 +19,7 @@ class BiliBiliLiveGift:
         self.session = passport.session
 
     def get_room_info(self, room_id):
-        meta_info = self.get_room_metainfo(room_id)
+        meta_info = self.get_room_meta_info(room_id)
         if not meta_info:
             return
         payload = {'roomid': meta_info['room_id']}
@@ -28,8 +28,9 @@ class BiliBiliLiveGift:
         if payload['code'] == 0:
             payload['data'].update({'danmu_rnd': meta_info['danmu_rnd']})
             return payload['data']
+        self.logger.info('get room info failed: %(msg)s', payload)
 
-    def get_room_metainfo(self, room_id):
+    def get_room_meta_info(self, room_id):
         if not room_id:
             return
         rasp = self.session.get(API_LIVE_ROOM % room_id)
@@ -41,7 +42,7 @@ class BiliBiliLiveGift:
     def get_gift_renewal(self):
         self.session.get(API_LIVE_SUMMER_HEART)
 
-    def get_gift_metainfo(self):
+    def get_gift_meta_info(self):
         rasp = self.session.get(API_LIVE_GIFT_PLAYER_BAG)
         items = rasp.json()['data']
         if not len(items):
@@ -82,11 +83,13 @@ class BiliBiliLiveGift:
         self.logger.info('\n%s', build_report(items))
 
 
-def send_gift(passport):
+def send_gift(passport: BiliBiliPassport):
     while True:
-        gift = BiliBiliLiveGift(BiliBiliPassport(passport))
+        if not passport.login():
+            continue
+        gift = BiliBiliLiveGift(passport)
         gift.get_gift_renewal()
-        meta_info = gift.get_gift_metainfo()
+        meta_info = gift.get_gift_meta_info()
         if not meta_info:
             continue
         room_info = meta_info['room_info']

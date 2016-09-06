@@ -19,7 +19,7 @@ class BiliBiliLiveRoom:
         rasp = self.session.post(API_LIVE_USER_ONLINE_HEART, headers=headers)
         payload = rasp.json()
         if payload['code'] != 0:
-            self.logger.info('Open treasure failed: %(msg)s', payload)
+            self.logger.info('Open failed: %(msg)s', payload)
             return False
         return True
 
@@ -53,9 +53,11 @@ class BiliBiliLiveRoom:
         self.logger.info('\n%s', build_report(items))
 
 
-def send_heart(passport):
+def send_heart(passport: BiliBiliPassport):
     while True:
-        live = BiliBiliLiveRoom(BiliBiliPassport(passport))
+        if not passport.login():
+            continue
+        live = BiliBiliLiveRoom(passport)
         heart_status = live.send_heart()
         user_info = live.get_user_info()
         if heart_status:

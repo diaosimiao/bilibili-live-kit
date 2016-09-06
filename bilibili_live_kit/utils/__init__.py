@@ -37,7 +37,7 @@ def set_logger_level(options):
     }
     loggers = {
         '': {
-            'handlers': ['console' if sys.stdout.isatty() else 'file'],
+            'handlers': handlers.keys(),
             'level': 'INFO',
             'propagate': True
         }

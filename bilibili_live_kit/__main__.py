@@ -12,15 +12,17 @@ def start_service():
     from .plugins.live_gift import send_gift
     from .plugins.live_room import send_heart
     from .plugins.live_treasure import send_treasure
+    from .plugins.passport import BiliBiliPassport
     from .utils import set_logger_level
     conf = json.load(open('configure.json'))
     set_logger_level(conf['logging'])
 
     for passport in conf['passports']:
+        passport = BiliBiliPassport(passport)
         for handler in (send_heart, send_gift, send_check_in, send_treasure):
             thread = Thread(
                 target=handler,
-                name='%s ~ %s' % (handler.__name__, passport['username']),
+                name='%s ~ %s' % (handler.__name__, passport.username),
                 kwargs={'passport': passport}
             )
             thread.start()

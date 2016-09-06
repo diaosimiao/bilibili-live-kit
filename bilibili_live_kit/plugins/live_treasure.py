@@ -61,9 +61,11 @@ class BiliBiliLiveTreasure:
             return -255
 
 
-def send_treasure(passport):
+def send_treasure(passport: BiliBiliPassport):
     while True:
-        treasure = BiliBiliLiveTreasure(BiliBiliPassport(passport))
+        if not passport.login():
+            continue
+        treasure = BiliBiliLiveTreasure(passport)
         wait_time = treasure.get_wait_time()
         if wait_time > 0:
             sleep(timedelta(minutes=wait_time, seconds=1).total_seconds())

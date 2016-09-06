@@ -14,7 +14,10 @@ class BiliBiliLiveCheckIn:
     def has_check_in(self):
         rasp = self.session.get(API_LIVE_SIGN_GET_SIGN_INFO)
         payload = rasp.json()
-        return bool(payload['data']['status'])
+        if payload['code'] == 0:
+            return bool(payload['data']['status'])
+        self.logger.info('Open has_check_in failed: %(msg)s', payload)
+        return False
 
     def send_check_in(self):
         rasp = self.session.get(API_LIVE_SIGN_DO_SIGN)
@@ -22,9 +25,11 @@ class BiliBiliLiveCheckIn:
         return payload['code'] == 0
 
 
-def send_check_in(passport):
+def send_check_in(passport: BiliBiliPassport):
     while True:
-        check_in = BiliBiliLiveCheckIn(BiliBiliPassport(passport))
+        if not passport.login():
+            continue
+        check_in = BiliBiliLiveCheckIn(passport)
         if not check_in.has_check_in():
             check_in.send_check_in()
         sleep(HEART_DELTA.total_seconds())
