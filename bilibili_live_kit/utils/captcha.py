@@ -1,5 +1,3 @@
-from difflib import SequenceMatcher
-
 from PIL import Image
 
 __ALL__ = ['get_captcha']
@@ -23,16 +21,21 @@ def get_samples() -> dict:
 
 
 def get_symbol(code: str):
+    from difflib import SequenceMatcher
+    from math import fabs
     ratios = sorted(
         (
             (key, SequenceMatcher(None, sample, code).ratio())
             for key, sample
             in get_samples().items()
+            if fabs(len(sample) - len(code)) <= 30
         ),
-        key=lambda item: item[1]
+        key=lambda item: -item[1]
     )
-    key, ratio = ratios[-1]
-    return key if ratio > 0.95 else '?'
+    key, ratio = ratios[0]
+    if ratio < 0.95:
+        raise Exception('Unknown Char')
+    return key
 
 
 def trim_y(image: Image) -> Image:
@@ -81,12 +84,7 @@ def get_sub_image(image: Image):
 
 def get_captcha(image):
     image = Image.open(image).convert('LA')
-
-    def handle():
-        for sub_image in get_sub_image(image):
-            symbol = get_symbol(image_to_ascii_image(sub_image))
-            if symbol == '?':
-                raise Exception('Unknown Char')
-            yield symbol
-
-    return ''.join(handle())
+    images = get_sub_image(image)
+    images = map(image_to_ascii_image, images)
+    symbols = map(get_symbol, images)
+    return ''.join(symbols)
