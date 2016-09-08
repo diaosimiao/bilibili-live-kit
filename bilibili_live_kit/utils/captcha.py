@@ -7,10 +7,10 @@ __ALL__ = ['get_captcha']
 
 
 @lru_cache(maxsize=1)
-def get_samples():
-    import base64
-    import gzip
-    import json
+def get_samples() -> dict:
+    from base64 import decodebytes
+    from gzip import decompress
+    from json import loads
     payload = b'''
     H4sIAJug0VcC/+2YbQ7CIAyGr7Lsr5q0futVjCcx3l3RbbQM1gFjm0P+iE8Io/SltDzKQ3ktbiUa
     rVwX8Qx0m5zpBrG2kelHZcS28VnIXt3fcP+RF7Wl8Qu1rw8kawuAVBn+kOnKG1as+vGF9YxhsFlP
@@ -20,25 +20,25 @@ def get_samples():
     bZx1PnsGmcvDyCn1u5uLGdcgdrLOAgBcLu3JQGYYyUAsMrwYBBUoTgZBhYxY3Ch5wf/p488SRa/n
     CzyRsY42GAAA
     '''
-    return json.loads(gzip.decompress(base64.decodebytes(payload)).decode())
+    samples = loads(decompress(decodebytes(payload)).decode())
+    return {key: '-'.join(sample) for key, sample in samples.items()}
 
 
-def get_symbol(code, threshold):
-    symbol_key = '?'
-    symbol_score = 0
-    for key, sample in get_samples().items():
-        sample = '-'.join(sample)
-        if len(sample) != len(code):
-            continue
-        score = SequenceMatcher(None, sample, code).ratio()
-        if score < symbol_score and score < threshold:
-            continue
-        symbol_key = key
-        symbol_score = score
-    return symbol_key
+@lru_cache()
+def get_symbol(code: str):
+    ratios = sorted(
+        (
+            (key, SequenceMatcher(None, sample, code).ratio())
+            for key, sample
+            in get_samples().items()
+        ),
+        key=lambda item: item[1]
+    )
+    key, ratio = ratios[-1]
+    return key if ratio > 0.95 else '?'
 
 
-def trim_y(image):
+def trim_y(image: Image) -> Image:
     start, end = 0, 0
     width, height = image.size
     for y in range(height):
@@ -54,7 +54,7 @@ def trim_y(image):
     return image.crop((0, start, width, end))
 
 
-def image_to_ascii_image(image):
+def image_to_ascii_image(image: Image) -> str:
     def handle():
         width, height = image.size
         for y in range(height):
@@ -63,10 +63,10 @@ def image_to_ascii_image(image):
                 yield '1' if point < 0x7F else '0'
             yield '-'
 
-    return ''.join(handle()).strip('-')
+    return ''.join(handle())
 
 
-def get_sub_image(image):
+def get_sub_image(image: Image):
     width, height = image.size
     start = 0
     for x in range(width):
@@ -87,7 +87,7 @@ def get_captcha(image):
 
     def handle():
         for sub_image in get_sub_image(image):
-            symbol = get_symbol(image_to_ascii_image(sub_image), threshold=0.95)
+            symbol = get_symbol(image_to_ascii_image(sub_image))
             if symbol == '?':
                 raise Exception('Unknown Char')
             yield symbol
