@@ -1,3 +1,4 @@
+from difflib import SequenceMatcher
 from functools import lru_cache
 
 from PIL import Image
@@ -25,12 +26,11 @@ def get_samples():
 def get_symbol(code, threshold):
     symbol_key = '?'
     symbol_score = 0
-    for key, value in get_samples().items():
-        value = '-'.join(value)
-        if len(value) != len(code):
+    for key, sample in get_samples().items():
+        sample = '-'.join(sample)
+        if len(sample) != len(code):
             continue
-        score = len(list(filter(lambda offset: value[offset] == code[offset], range(len(value)))))
-        score /= len(value)
+        score = SequenceMatcher(None, sample, code).ratio()
         if score < symbol_score and score < threshold:
             continue
         symbol_key = key
