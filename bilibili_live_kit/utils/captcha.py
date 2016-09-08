@@ -5,16 +5,15 @@ __ALL__ = ['get_captcha']
 
 def get_samples() -> dict:
     from base64 import decodebytes
-    from gzip import decompress
+    from zlib import decompress
     from json import loads
     payload = b'''
-    H4sIAJug0VcC/+2YbQ7CIAyGr7Lsr5q0futVjCcx3l3RbbQM1gFjm0P+iE8Io/SltDzKQ3ktbiUa
-    rVwX8Qx0m5zpBrG2kelHZcS28VnIXt3fcP+RF7Wl8Qu1rw8kawuAVBn+kOnKG1as+vGF9YxhsFlP
-    EMQ+jvaEhrSZ34eDSnyXr/gGPv+TnsM5nOtGLGnj4uxj23ZR8up2i7aNIxvjR7L+lsCaJdnCeCcT
-    or0tMPNoKzGeVGjG0wxjGETL67z46GVeOSSymPIiO2C4lMumPc65f3qG7CK4ktdxCfKaZYGQfYKg
-    5LXhdSUbx/+o0ViXCfrmQaGLQhetXXne3++qDV2RuiuucAqH6YqH1ItXO7jLOrvDdiaH7awNLVmb
-    bZx1PnsGmcvDyCn1u5uLGdcgdrLOAgBcLu3JQGYYyUAsMrwYBBUoTgZBhYxY3Ch5wf/p488SRa/n
-    CzyRsY42GAAA
+    eNrtmN0OgjAMhV+FcKsmrf/6KsYnMb67DATWraNjA3TAruaXZZZyeuj2yjf5PXvkUA5Uo5rm22w6
+    iOYYAE4T/LOguzKDfET0h1oNVb5pwGwWejMtvJUlzkJ0oOSFdTm3dYDCFIUpslN53/SnKqH7WdUr
+    tINh7bNRxDEgrP4vgTUhcW7ayTgnZpiGaqajDkaQxoAytFlUvR4WLS+0pYS2bJCRDbeO3Y+XsHfM
+    iX8Ojlp3p+mZK0kJxnVNTGH2gFwN+8Mvo9rwhvWOYbCJJwiO1xg7fHwwqMR3oo1xqI+5vY1a8K/Y
+    gL4d40+L87bzHD6dfynD9SRVwMvY7uVixmvGTtbZvIOrG/JkIDOMZCAeEHoxCDpcOBkEHULEg4mS
+    13X290BmR6NdK5hNuZYBI2X0NdvrnPlrd1ike93Wa8YxUmtLLu1+LEhe7w/Wq12z
     '''
     samples = loads(decompress(decodebytes(payload)).decode())
     return {key: '-'.join(sample) for key, sample in samples.items()}
