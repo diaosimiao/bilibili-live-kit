@@ -1,12 +1,10 @@
 from difflib import SequenceMatcher
-from functools import lru_cache
 
 from PIL import Image
 
 __ALL__ = ['get_captcha']
 
 
-@lru_cache(maxsize=1)
 def get_samples() -> dict:
     from base64 import decodebytes
     from gzip import decompress
@@ -24,7 +22,6 @@ def get_samples() -> dict:
     return {key: '-'.join(sample) for key, sample in samples.items()}
 
 
-@lru_cache()
 def get_symbol(code: str):
     ratios = sorted(
         (
