@@ -4,19 +4,17 @@ __ALL__ = ['get_captcha']
 
 
 def get_samples() -> dict:
-    from base64 import decodebytes
+    from base64 import a85decode
     from zlib import decompress
     from json import loads
-    payload = b'''
-    eAHt2AVOBEEUhOG4cAkkjlbjXGXl/sfAKp0fGX8Zn8J6vqxvbecN+/3F28X12f5C6Vf0iRfpT1qb
-    vjN/I61MRUaiNv3X4Hj8qtbr4gsmYyZhyZTNR46UTZDKL1f8+nG/a/uQUbCX74KZyAAFE2aqMjkV
-    JhvU3FRvKWjCTDETZoqZMFM3g2wu2PMCdjAnbtuY0MMO9tTjDkYCNrniiPRuCyjYo3ewov0Xq0es
-    C2JdEOuEmP+0Rh90xWzdMP1NFAvmEfWCrt/Dok4BRLCK6S6ZMAiDai4HYuBK97f7lRYMKrYO4z6E
-    QX8tNGJjULVBWCaMi2HBgiUXTOL9SDXLVLNMhUtp2UteUm3/eOzTtrOqm++CFV+SAy5/5UIGptw4
-    9jfp9f3gj8fjyQckHWV1
+    payload = '''
+    GQI2t7<ZU7$q0hM`OoL]9As,ei;Ub&r_P`]j?Z.Mg@`_!BX)4]m<$nnhk[S4r>4ZtI/p[AP6665"
+    :jq_g?NdgB_OZN"$uDX`/=l)$.bLeq!<h7HZ7uKJt+g1H\mA/D'KMn^o'Fg3=l2j&"jp#])_s%?%
+    ;qM3ktil"O-0`%W;/@%o?mm28)6>_9L!c!NLdcrFLCl4.lguE;`rNZC1slK)fWh:a:K'!O2KgYZ2
+    oa'M5eq&p\u^&><lEokTF!8q7?j@5!WGI/<aH^P7m0<K#$$`W87,KqT)cR.!YrgR7jGi!nl`fE(7
+    W#=6u"UIMse^4raf+'.6'gWtBVoUlhg0gGP$B6N&:R:>Eo4gLc<@XCo'<i_uCRh"S"
     '''
-    samples = loads(decompress(decodebytes(payload)).decode())
-    return {key: '-'.join(sample) for key, sample in samples}
+    return dict(loads(decompress(a85decode(payload)).decode()))
 
 
 def get_symbol(code: str):
