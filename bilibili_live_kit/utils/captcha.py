@@ -8,15 +8,15 @@ def get_samples() -> dict:
     from zlib import decompress
     from json import loads
     payload = b'''
-    eNrtmN0OgjAMhV+FcKsmrf/6KsYnMb67DATWraNjA3TAruaXZZZyeuj2yjf5PXvkUA5Uo5rm22w6
-    iOYYAE4T/LOguzKDfET0h1oNVb5pwGwWejMtvJUlzkJ0oOSFdTm3dYDCFIUpslN53/SnKqH7WdUr
-    tINh7bNRxDEgrP4vgTUhcW7ayTgnZpiGaqajDkaQxoAytFlUvR4WLS+0pYS2bJCRDbeO3Y+XsHfM
-    iX8Ojlp3p+mZK0kJxnVNTGH2gFwN+8Mvo9rwhvWOYbCJJwiO1xg7fHwwqMR3oo1xqI+5vY1a8K/Y
-    gL4d40+L87bzHD6dfynD9SRVwMvY7uVixmvGTtbZvIOrG/JkIDOMZCAeEHoxCDpcOBkEHULEg4mS
-    13X290BmR6NdK5hNuZYBI2X0NdvrnPlrd1ike93Wa8YxUmtLLu1+LEhe7w/Wq12z
+    eAHt2AVOBEEUhOG4cAkkjlbjXGXl/sfAKp0fGX8Zn8J6vqxvbecN+/3F28X12f5C6Vf0iRfpT1qb
+    vjN/I61MRUaiNv3X4Hj8qtbr4gsmYyZhyZTNR46UTZDKL1f8+nG/a/uQUbCX74KZyAAFE2aqMjkV
+    JhvU3FRvKWjCTDETZoqZMFM3g2wu2PMCdjAnbtuY0MMO9tTjDkYCNrniiPRuCyjYo3ewov0Xq0es
+    C2JdEOuEmP+0Rh90xWzdMP1NFAvmEfWCrt/Dok4BRLCK6S6ZMAiDai4HYuBK97f7lRYMKrYO4z6E
+    QX8tNGJjULVBWCaMi2HBgiUXTOL9SDXLVLNMhUtp2UteUm3/eOzTtrOqm++CFV+SAy5/5UIGptw4
+    9jfp9f3gj8fjyQckHWV1
     '''
     samples = loads(decompress(decodebytes(payload)).decode())
-    return {key: '-'.join(sample) for key, sample in samples.items()}
+    return {key: '-'.join(sample) for key, sample in samples}
 
 
 def get_symbol(code: str):
