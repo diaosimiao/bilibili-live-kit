@@ -7,7 +7,7 @@ def get_samples() -> dict:
     from base64 import a85decode
     from zlib import decompress
     from json import loads
-    payload = '''
+    payload = r'''
     GQI2t7<ZU7$q0hM`OoL]9As,ei;Ub&r_P`]j?Z.Mg@`_!BX)4]m<$nnhk[S4r>4ZtI/p[AP6665"
     :jq_g?NdgB_OZN"$uDX`/=l)$.bLeq!<h7HZ7uKJt+g1H\mA/D'KMn^o'Fg3=l2j&"jp#])_s%?%
     ;qM3ktil"O-0`%W;/@%o?mm28)6>_9L!c!NLdcrFLCl4.lguE;`rNZC1slK)fWh:a:K'!O2KgYZ2
