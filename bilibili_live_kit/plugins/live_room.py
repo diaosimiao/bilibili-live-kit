@@ -30,13 +30,22 @@ class BiliBiliLiveRoom:
             return payload
         return False
 
+    @staticmethod
+    def get_online_experience(user_data):
+        baseline = 3000
+        if user_data['svip']:
+            return baseline * 2.5
+        if user_data['vip']:
+            return baseline * 2
+        return baseline * 1
+
     def print_heart_report(self, user_info):
         if not user_info:
             return
         data = user_info['data']
         heart_time = datetime.now()
         upgrade_requires = data['user_next_intimacy'] - data['user_intimacy']
-        upgrade_takes_time = ceil(upgrade_requires / 3000) * HEART_DELTA
+        upgrade_takes_time = ceil(upgrade_requires / self.get_online_experience(data)) * HEART_DELTA
         upgrade_done_time = heart_time + upgrade_takes_time
         items = (
             '---------------------------------------',
